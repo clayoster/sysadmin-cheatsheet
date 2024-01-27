@@ -33,6 +33,7 @@
   - [View Network Interface Details (Linux)](#View-Network-Interface-Details-Linux)
 - [VMware PowerCLI](#VMware-PowerCLI)
 - [Linux - Useful Commands](#Linux---Useful-Commands)
+  - [Debian](#Debian)
   - [RHEL](#RHEL)
 - [WSL - Windows Subsystem for Linux](#WSL---Windows-Subsystem-for-Linux)
   - [Disable Terminal Beep](#Disable-Terminal-Beep)
@@ -522,6 +523,19 @@ connect-viserver vcenter.example.com
 
 # Linux - Useful Commands
 
+## Debian
+
+List files within a Deb package
+
+- Downloaded Deb Package:\
+`dpkg --contents <rpmname>.deb`
+- Installed Deb Package:\
+`dpkg -L <packagename>`
+
+Determine the package a file comes from:
+
+        dpkg -S /path/to/file
+
 ## RHEL 
 
 View file/folder permissions set by package (NGINX as an example)
@@ -551,6 +565,27 @@ Disable a repository for a single yum transaction
         yum --disablerepo="reponame" info openssh
 
         Alternatively, a repo can be enabled for a single yum transaction by using the --enablerepo option
+
+Show all available versions of a package
+
+        yum --showduplicates list <packagename>
+
+Install specific version of a package
+
+        yum install <packagename>-<versionnumber>
+
+List files within an RPM package
+
+- Downloaded RPM Package:\
+`rpm -qlp <rpmname>.rpm`
+- Installed RPM Package:\
+`rpm -ql <packagename>`
+
+Determine the package a file comes from:
+
+        rpm -qf /path/to/file
+        yum whatprovides /path/to/file
+        dnf provides /bin/ps
 
 Fix Yum if the command "hangs" and does not return output
 

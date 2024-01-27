@@ -458,7 +458,8 @@ To kill a currently established TCP connection, the following command can be use
 
 ### Clearing ARP cache
 
-#### ESXi 5.1
+**ESXi 5.1**
+
 View ARP cache:
 
         esxcli network ip neighbor list
@@ -466,7 +467,8 @@ Remove an item from ARP cache:
 
         vsish -e set /net/tcpip/v4/neighbor del IPADDRESS
         
-#### Debian
+**Debian**
+
 View ARP cache:
 
         arp

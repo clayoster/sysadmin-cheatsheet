@@ -18,9 +18,8 @@
 - DNS
   - [Query for Active Directory Domain Controller SRV records](#Query-for-Active-Directory-Domain-Controller-SRV-records)
   - [Clearing DNS records from Active Directory cache](#Clearing-DNS-records-from-Active-Directory-cache)
-- Git
-  - [Gitlab - Generate list of active users and email addresses from Gitlab API](#Generate-list-of-active-users-and-email-addresses-from-Gitlab-API)
-  - [Gitlab - Purging data from Git repositories](#Purging-data-from-Git-repositories)
+- [Git](#Git)
+  - [Gitlab Specific](#Gitlab-Specific)
 - SaltStack
   - [Useful Commands](#Useful-Commands)
 - MySQL
@@ -293,6 +292,14 @@ Info gathered from:
 - https://docs.microsoft.com/en-us/powershell/module/dnsserver/Remove-DnsServerResourceRecord
 
 # Git
+
+#### List Remotes
+
+        git remote -v 
+
+#### Clean changes from repo including files that match .gitignore
+
+        git clean -Xdf
 
 ## Gitlab Specific
 

@@ -11,6 +11,9 @@
   - [Extract Key from PFX/PKCS12 file](#Extract-Key-from-PFXPKCS12-file)
   - [Testing Public-Facing Web Servers](#Testing-Public-Facing-Web-Servers)
   - [HTTPS Testing and Hardening Tools](#HTTPS-Testing-and-Hardening-Tools)
+- Web Servers
+  - [Apache](#Apache)
+  - [NGINX](#NGINX)
 - Storage
   - [Resizing Virtual Disks](#Resizing-virtual-disks)
   - [Finding Disk Usage](#Finding-Disk-Usage)
@@ -200,6 +203,26 @@ Create PFX/PKCS12 file with friendlyname (-name) and include cert chain file (-c
 - https://sslmonitor.eu/
 - https://github.com/sigio/sslmonitor/tree/master
 - https://github.com/jumanjihouse/docker-testssl
+
+# Web Servers
+
+## Apache
+Print the current Apache config
+
+        apachectl -S
+
+List loaded apache modules
+
+        apachectl -M
+
+## NGINX
+Print the current NGINX config
+
+        nginx -T
+
+Test the NGINX config file for errors
+
+        nginx -t
 
 # Storage
 

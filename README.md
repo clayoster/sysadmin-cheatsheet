@@ -38,6 +38,7 @@
   - [Debian](#Debian)
   - [RHEL](#RHEL)
   - [Linux Benchmarking](#Linux-Benchmarking)
+  - [Miscellaneous](#Miscellaneous)
 - [WSL - Windows Subsystem for Linux](#WSL---Windows-Subsystem-for-Linux)
   - [Disable Terminal Beep](#Disable-Terminal-Beep)
 
@@ -669,6 +670,18 @@ Server Command
 Client Command
 
         iperf -c <ip of server running iperf3> -p 5201 -t 30s
+
+## Miscellaneous
+
+#### Determining the purpose of a server
+
+I usually use a combination of looking at running services in `systemctl list-units`, which ports have processes bound to them or sockets established with `netstat -nlp`, look at crons that are configured with `crontab -l` or looking at what exists in `/var/spool/cron` and then follow breadcrumbs from there.
+
+#### Commands to determine if a server is physical or virtual (by order of likeliness to exist on the system)
+
+        dmidecode -s system-manufacturer
+        systemd-detect-virt
+        virt-what
 
 # WSL - Windows Subsystem for Linux
 

@@ -76,6 +76,14 @@ This command will display the TLS/SSL protocols that the web server supports:
                 
                 Nmap done: 1 IP address (1 host up) scanned in 0.78 seconds
 
+## Scanning for Certificate Usage and Expiration By Subnet
+
+This command will scan the specified subnet and look for certificates on the common HTTPS ports 443 and 8443, then filter the output to include the subject, subject alternative name, and expiration timestamp.
+
+This will only find certificates that are configured for the IP or the default server. If there are multiple sites / vhosts at the IP address configured with SNI, they will not be found with this command.
+
+        nmap -p 443,8443 -sV -sC 172.21.0.0/24 | grep -E '(Nmap scan report|[0-9]+/tcp|ssl-cert|Subject Alternative Name|Not valid after)'
+
 ## Validating Certificate Files
 
 Test connecting using TLSv1.2 and TLSv1.3
@@ -211,6 +219,10 @@ Create PFX/PKCS12 file with friendlyname (-name) and include cert chain file (-c
 Print the current Apache config
 
         apachectl -S
+
+Test the current Apache config for errors
+
+        apachectl configtest
 
 List loaded apache modules
 

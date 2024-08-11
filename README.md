@@ -582,6 +582,12 @@ Determine the package a file comes from:
 
         dpkg -S /path/to/file
 
+Find Package Dependencies
+- Recursive dependencies for a package:\
+`apt depends --recurse <package name>`
+- Reverse dependency lookup based on installed packages:\
+`apt rdepends --installed `<package name>
+
 ## RHEL 
 
 View file/folder permissions set by package (NGINX as an example)

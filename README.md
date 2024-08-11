@@ -629,9 +629,65 @@ List files within an RPM package
 
 Determine the package a file comes from:
 
-        rpm -qf /path/to/file
-        yum whatprovides /path/to/file
-        dnf provides /bin/ps
+- `yum whatprovides /path/to/file`
+- `rpm -qf /path/to/file`
+- `dnf provides /bin/ps`
+
+Finding Package Dependencies
+- With an rpm file:\
+`rpm -qpR <name>.rpm`
+- With an installed package:\
+`rpm -qR <package name>`
+- With repoquery (included in the dnf-utils or yum-utils package):\
+`repoquery --requires --resolve <package name>`
+- With repoquery (recursive):\
+`repoquery --requires --resolve --recursive <package name>`
+- With repoquery (reverse lookup):\
+`repoquery --whatdepends <package name> --installed`
+
+Replace one similar/equivalent package with another
+- `dnf --allowerasing <new package>`
+- `dnf swap <old package> <new package>`
+
+List all packages available in all enabled repositories:
+
+        dnf list --all
+
+View Package Changelog (from repo):
+
+        dnf changelog <package name>
+
+View Package Changelog (currently installed package):
+
+        rpm -q --changelog <package name>
+
+Simulate Updates:
+
+        dnf update --assumeno
+
+Install only package updates that resolve a CVE or multiple CVEs:
+
+        dnf update --cve=CVE-####-####
+        dnf update --cves=CVE-####-####,CVE-####-####,CVE-####-####
+
+Install only package updates that resolve an advisory:
+
+        dnf update --advisory=RHSA-XXXX:XXXX
+        dnf update --advisories=RHSA-XXXX:XXXX,RHSA-XXXX:XXXX,RHSA-XXXX:XXXX
+
+Install all security updates updates:
+
+        dnf update --security
+
+List security updates that have been installed on a server:
+
+        dnf updateinfo security --installed
+
+Other Useful RHEL Links:
+
+- RHEL Security Advisory Database: https://access.redhat.com/security/security-updates/
+- Red Hat CVE Database: https://access.redhat.com/security/security-updates/#/cve
+- RHEL Package Browser (Requires RHEL Account): https://access.redhat.com/downloads/content/package-browser
 
 Fix Yum if the command "hangs" and does not return output
 

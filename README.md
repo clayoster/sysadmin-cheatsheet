@@ -576,7 +576,7 @@ List files within a Deb package
 - Downloaded Deb Package:\
 `dpkg --contents <rpmname>.deb`
 - Installed Deb Package:\
-`dpkg -L <packagename>`
+`dpkg -L <package name>`
 
 Determine the package a file comes from:
 
@@ -593,7 +593,7 @@ Clean up old kernels (Preserving the current and 1 previous version):\
 
 - RHEL 5/6/7 (requires yum-utils package):
 
-  `package-cleanup --oldkernels --count=2`
+	`package-cleanup --oldkernels --count=2`
 		
 - RHEL 8/9:
 
@@ -614,18 +614,18 @@ Disable a repository for a single yum transaction
 
 Show all available versions of a package
 
-        yum --showduplicates list <packagename>
+        yum --showduplicates list <package name>
 
 Install specific version of a package
 
-        yum install <packagename>-<versionnumber>
+        yum install <package name>-<version number>
 
 List files within an RPM package
 
 - Downloaded RPM Package:\
-`rpm -qlp <rpmname>.rpm`
+`rpm -qlp <name>.rpm`
 - Installed RPM Package:\
-`rpm -ql <packagename>`
+`rpm -ql <package name>`
 
 Determine the package a file comes from:
 

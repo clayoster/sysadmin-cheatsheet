@@ -350,7 +350,7 @@ https://docs.gitlab.com/ee/api/users.html
 ## Purging data from Git repositories
 
 If large binary files or executables have been stored in a git repository and you would like to clean them, this is a good tutorial from Gitlab is helpful:\
-https://docs.gitlab.com/14.5/ee/user/project/repository/reducing_the_repo_size_using_git.html
+https://docs.gitlab.com/17.0/ee/user/project/repository/reducing_the_repo_size_using_git.html
 
 (This requires the git-filter-repo package which is currently only available in the bullseye-backports repo in Debian)
 
@@ -363,6 +363,8 @@ After running the "git filter-repo" command, there is a file in the project dire
 After running through this process, I was able to drop the repo size from 700MB to 5MB.
 
 **NOTE:** This process can also be used to delete files containing sensitive information from repositories, but it *MAY* not completely remove it.
+
+# Add note about downloading git-filter-repo from Github and running with python3 instead of depending upon a repo package 
 
 # SaltStack
 

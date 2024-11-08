@@ -268,6 +268,10 @@ This command will poke at the SCSI controllers to look for changes. Helpful for 
 
         for i in /sys/class/scsi_device/*/device/rescan; do echo '- - -' >"$i"; done
 
+The `sg3_utils` package in RHEL-based distributions provide a command that performs the same function
+
+        scsi-rescan
+
 ## Securely wiping a disk with Shred
 
 The shred command can be used to securely wipe a disk. This command should be available on most systems. This command will make 3 passes of writing random data to the device, then a single pass of writing 0's to the device to hide the fact that it has been wiped.

@@ -341,6 +341,25 @@ Info gathered from:
 
         git clean -Xdf
 
+## Debugging git CLI comamnds
+
+### Enable trace logging with git commands
+- In Linux (bash): `GET_TRACE=1
+- In Windows (CMD): `set GIT_TRACE=1`
+- In Windows (Powershell): `$env:GIT_TRACE=1
+
+### Increase the verbosity of the git SSH command
+        GIT_SSH_COMMAND="ssh -vvv" git fetch
+
+### The loglevel can be turned up on per host in `~/.ssh/config`:
+
+        Host github.com
+                LogLevel DEBUG3
+
+### Show all current configuration
+
+        git config --global --list
+
 ## Gitlab Specific
 
 ### Generate list of active users and email addresses from Gitlab API

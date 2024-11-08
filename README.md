@@ -639,9 +639,14 @@ Determine the package a file comes from:
 - `rpm -qf /path/to/file`
 - `dnf provides /bin/ps`
 
+List all packages that are installed from a specific repo (using the EPEL repo as an example):
+
+- `dnf list installed | grep @epel`
+- `dnf repo-pkgs epel list installed`
+
 Finding Package Dependencies
 - With an rpm file:\
-`rpm -qpR <name>.rpm`
+`rpm -qpR <package name>.rpm`
 - With an installed package:\
 `rpm -qR <package name>`
 - With repoquery (included in the dnf-utils or yum-utils package):\
@@ -650,6 +655,9 @@ Finding Package Dependencies
 `repoquery --requires --resolve --recursive <package name>`
 - With repoquery (reverse lookup):\
 `repoquery --whatdepends <package name> --installed`
+
+List what capabilities a package provides
+- `rpm -q --provides <package name>`
 
 Replace one similar/equivalent package with another
 - `dnf --allowerasing <new package>`

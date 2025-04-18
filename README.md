@@ -754,16 +754,16 @@ RAM Test
         sysbench memory run
 
 #### Storage Benchmarking Tool: fio
-- Make sure the current working directory has 4G of disk space available. Don't forget to delete the 'test' file at the end!
+- Make sure the directory that the 'test' file will be placed in 4G of disk space available. (Don't forget to delete the 'test' file at the end!)
 - The `--bs=4k` parameter may need to be adjusted depending on your storage setup
 - Examples were pulled from here: https://forums.lawrencesystems.com/t/linux-benchmarking-with-fio/11122
 
 Random Reads
 
-        sync; fio --randrepeat=1 --ioengine=libalo --direct=1 --name=test --filename=test --bs=4k --size=4G --readwrite=randread --ramp_time=4
+        sync; fio --randrepeat=1 --ioengine=libalo --direct=1 --name=/path/to/test --filename=test --bs=4k --size=4G --readwrite=randread --ramp_time=4
 Random Writes
 
-        sync; fio --randrepeat=1 --ioengine=libalo --direct=1 --name=test --filename=test --bs=4k --size=4G --readwrite=randwrite --ramp_time=4
+        sync; fio --randrepeat=1 --ioengine=libalo --direct=1 --name=/path/to/test --filename=test --bs=4k --size=4G --readwrite=randwrite --ramp_time=4
 
 #### Network Benchmarking Tool: iperf3
 You will need two servers for this test. One will act as the client and one will act as the server. These commands will run a 30 second test showing the speed that can be achieved between the two systems.

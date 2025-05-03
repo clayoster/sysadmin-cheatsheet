@@ -596,6 +596,29 @@ Find Package Dependencies
 - Reverse dependency lookup based on installed packages:\
 `apt rdepends --installed `<package name>
 
+### Package Cleanup
+
+Remove orphaned packages
+
+        apt autoremove --purge
+
+Remove config files for packages that were removed but not purged
+
+Confirm they are no longer needed before proceeding with removal!
+
+        apt-get purge $(dpkg -l | grep -E '^rc' | awk '{print $2}' | while read line; do printf "$line "; done)
+
+Post-Upgrade Cleanup Command
+
+After running OS versions, use this command to purge packages that were build for previous versions of Debian. Confirm\
+these packages are longer needed and/or determine an upgrade path for the packages before removal!
+
+        apt-get purge $(dpkg -l | grep -E '(deb9|stretch|deb10|buster|deb11|bullseye|^rc)' | awk '{print $2}' | while read line; do printf "$line "; done)
+
+Remove downloaded packages to clean up disk space
+
+        apt clean
+
 ## RHEL 
 
 View file/folder permissions set by package (NGINX as an example)
@@ -704,6 +727,20 @@ Install all security updates updates:
 List security updates that have been installed on a server:
 
         dnf updateinfo security --installed
+
+### Package Cleanup
+
+Display a list of orphaned packages (requires the dnf-utils package)
+
+        package-cleanup --leaves
+
+Remove orphaned packages
+
+        dnf autoremove
+
+Remove downloaded packages to clean up disk space
+
+        dnf clean packages
 
 Other Useful RHEL Links:
 

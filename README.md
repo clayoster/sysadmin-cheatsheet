@@ -35,7 +35,7 @@
   - [RHEL](#RHEL)
   - [Linux Benchmarking](#Linux-Benchmarking)
   - [Linux Storage](#Linux-Storage)
-    - [Resizing Virtual Disks](#Resizing-virtual-disks)
+    - [Rescan the SCSI Bus](#Rescan-the-SCSI-Bus)
     - [Finding Disk Usage](#Finding-Disk-Usage)
     - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
     - [Miscellaneous](#Miscellaneous)
@@ -765,9 +765,9 @@ In one case I found that rsyslogd was holding files open that were supposed to b
         
 #### If files cannot be written and df -h shows free space, check inode utilization
 
-    df -i
+        df -i
 
-### Resizing Virtual Disks
+### Rescan the SCSI Bus
 
 This command will poke at the SCSI controllers to look for changes. Helpful for detecting resized virtual disks without rebooting the VM.
 
@@ -777,11 +777,64 @@ The `sg3_utils` package in RHEL-based distributions provide a command that perfo
 
         scsi-rescan
 
+### Rescan Fibre Channel Connections (Loop Initialization Protocol)
+
+        for host in /sys/class/fc_host/host*; do echo "Rescanning $host"; echo "1" > "$host/issue_lip"; done
+
 ### Securely wiping a disk with Shred
 
 The shred command can be used to securely wipe a disk. This command should be available on most systems. This command will make 3 passes of writing random data to the device, then a single pass of writing 0's to the device to hide the fact that it has been wiped.
 
         shred -vfz /dev/(device name without partition number)
+
+### Showing storage device details
+
+#### List attached disks and their details
+
+        lshw -class disk
+
+#### List block devices
+
+        lsblk
+
+#### List block devices with filesystem information
+
+        lsblk -f
+
+#### View current multipath devices
+
+        multipath -ll
+
+#### Reload multipath device mappings
+
+        multipath -r
+
+#### Flush all unused multipath device mappings
+
+        multipath -F
+
+### Smartctl commands
+#### Check health of a single device
+
+        smartctl -H /dev/sda
+
+#### Show all devices found by smartctl
+
+        smartctl --scan
+        
+        # Example Output
+        /dev/bus/0 -d megaraid,1 # /dev/bus/0 [megaraid_disk_01], SCSI device
+        /dev/bus/0 -d megaraid,2 # /dev/bus/0 [megaraid_disk_02], SCSI device
+        /dev/bus/0 -d megaraid,3 # /dev/bus/0 [megaraid_disk_03], SCSI device
+        /dev/bus/0 -d megaraid,4 # /dev/bus/0 [megaraid_disk_04], SCSI device
+
+#### Show data for a single device accessed through a MegaRAID controller
+
+        smartctl -a -d megaraid,4 /dev/bus/0
+
+#### Using storcli to show all info for controller 0 (MegaRAID Controllers)
+
+        storcli /c0 show all
 
 ## Miscellaneous
 

@@ -300,6 +300,18 @@ Info gathered from:
 
         git clean -Xdf
 
+#### Add execute permissions to a file in a git repository
+
+        # Show permissions of files in the current directory of the repository
+        git ls-files --stage
+
+        # Add the execute permission to script.sh
+        git update-index --chmod=+x script.sh
+
+        # Add commit message and push
+        git commit -m "Add execute permission to script.sh"
+        git push
+
 ## Debugging git CLI comamnds
 
 ### Enable trace logging with git commands

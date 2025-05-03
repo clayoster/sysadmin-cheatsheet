@@ -213,16 +213,16 @@ Create PFX/PKCS12 file with friendlyname (-name) and include cert chain file (-c
 - https://github.com/sigio/sslmonitor/tree/master
 - https://github.com/jumanjihouse/docker-testssl
 
-### Trusting an Internal Root CA in Linux
+### Trusting a private Root CA in Linux
 
 #### Debian
-Add Root CA certificate files to `/usr/local/share/ca-certificates/`, then run this command:
+Add private Root CA certificate files to `/usr/local/share/ca-certificates/`, then run this command:
 
         update-ca-certificates
 
 #### RHEL
 
-Add Root CA certificate files to `/etc/pki/ca-trust/source/anchors/`, then run this command:
+Add private Root CA certificate files to `/etc/pki/ca-trust/source/anchors/`, then run this command:
 
         update-ca-trust extract
 

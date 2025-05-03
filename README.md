@@ -11,6 +11,7 @@
   - [Extract Key from PFX/PKCS12 file](#Extract-Key-from-PFXPKCS12-file)
   - [Testing Public-Facing Web Servers](#Testing-Public-Facing-Web-Servers)
   - [HTTPS Testing and Hardening Tools](#HTTPS-Testing-and-Hardening-Tools)
+  - [Trusting a private Root CA in Linux](#Trusting-a-private-Root-CA-in-Linux)
 - Web Servers
   - [Apache](#Apache)
   - [NGINX](#NGINX)

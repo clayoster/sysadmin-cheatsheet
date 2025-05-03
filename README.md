@@ -852,36 +852,36 @@ The shred command can be used to securely wipe a disk. This command should be av
 
 ### Showing storage device details
 
-#### List attached disks and their details
+List attached disks and their details
 
         lshw -class disk
 
-#### List block devices
+List block devices
 
         lsblk
 
-#### List block devices with filesystem information
+List block devices with filesystem information
 
         lsblk -f
 
-#### View current multipath devices
+View current multipath devices
 
         multipath -ll
 
-#### Reload multipath device mappings
+Reload multipath device mappings
 
         multipath -r
 
-#### Flush all unused multipath device mappings
+Flush all unused multipath device mappings
 
         multipath -F
 
 ### Smartctl commands
-#### Check health of a single device
+Check health of a single device
 
         smartctl -H /dev/sda
 
-#### Show all devices found by smartctl
+Show all devices found by smartctl
 
         smartctl --scan
         
@@ -891,11 +891,11 @@ The shred command can be used to securely wipe a disk. This command should be av
         /dev/bus/0 -d megaraid,3 # /dev/bus/0 [megaraid_disk_03], SCSI device
         /dev/bus/0 -d megaraid,4 # /dev/bus/0 [megaraid_disk_04], SCSI device
 
-#### Show data for a single device accessed through a MegaRAID controller
+Show data for a single device accessed through a MegaRAID controller
 
         smartctl -a -d megaraid,4 /dev/bus/0
 
-#### Using storcli to show all info for controller 0 (MegaRAID Controllers)
+Using storcli to show all info for controller 0 (MegaRAID Controllers)
 
         storcli /c0 show all
 

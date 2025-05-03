@@ -14,10 +14,6 @@
 - Web Servers
   - [Apache](#Apache)
   - [NGINX](#NGINX)
-- Storage
-  - [Resizing Virtual Disks](#Resizing-virtual-disks)
-  - [Finding Disk Usage](#Finding-Disk-Usage)
-  - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
 - DNS
   - [Query for Active Directory Domain Controller SRV records](#Query-for-Active-Directory-Domain-Controller-SRV-records)
   - [Clearing DNS records from Active Directory cache](#Clearing-DNS-records-from-Active-Directory-cache)
@@ -38,7 +34,11 @@
   - [Debian](#Debian)
   - [RHEL](#RHEL)
   - [Linux Benchmarking](#Linux-Benchmarking)
-  - [Miscellaneous](#Miscellaneous)
+  - [Linux Storage](#Linux-Storage)
+    - [Resizing Virtual Disks](#Resizing-virtual-disks)
+    - [Finding Disk Usage](#Finding-Disk-Usage)
+    - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
+    - [Miscellaneous](#Miscellaneous)
 - [WSL - Windows Subsystem for Linux](#WSL---Windows-Subsystem-for-Linux)
   - [Disable Terminal Beep](#Disable-Terminal-Beep)
 
@@ -782,6 +782,47 @@ Server Command
 Client Command
 
         iperf -c <ip of server running iperf3> -p 5201 -t 30s
+
+## Linux Storage
+
+### Finding Disk Usage
+
+#### TUI Utility similar to WinDirStat on Windows
+
+        ncdu
+
+#### Get summary of disk usage of top level directories under / while avoiding paths that will just give undesirable output
+
+        du -hs --exclude=/dev --exclude=/proc --exclude=/run --exclude=/sys /*
+
+#### Check home directories to see what large files were created in the past day:
+
+        find /home -size +100M -mtime -1 -exec du -hs {} \;
+
+#### Disk is filling up, but running 'du -hs' on the directory doesn't show what is using the disk space.
+In one case I found that rsyslogd was holding files open that were supposed to be deleted and were filling up the /var partition. To resolve the issue, I just had to restart rsyslog so it would let go of the file handles and allow them to be deleted. I used the following command to find that out:
+
+        lsof | grep "/var" | grep deleted
+        
+#### If files cannot be written and df -h shows free space, check inode utilization
+
+    df -i
+
+### Resizing Virtual Disks
+
+This command will poke at the SCSI controllers to look for changes. Helpful for detecting resized virtual disks without rebooting the VM.
+
+        for i in /sys/class/scsi_device/*/device/rescan; do echo '- - -' >"$i"; done
+
+The `sg3_utils` package in RHEL-based distributions provide a command that performs the same function
+
+        scsi-rescan
+
+### Securely wiping a disk with Shred
+
+The shred command can be used to securely wipe a disk. This command should be available on most systems. This command will make 3 passes of writing random data to the device, then a single pass of writing 0's to the device to hide the fact that it has been wiped.
+
+        shred -vfz /dev/(device name without partition number)
 
 ## Miscellaneous
 

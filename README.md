@@ -984,6 +984,7 @@ Manually run a container in 'my-namespace' for debugging\
 
 ## Cilium troubleshooting
 
+- https://docs.cilium.io/en/latest/cheatsheet/
 - https://docs.cilium.io/en/stable/operations/troubleshooting/
 
 Find the cilium pod names

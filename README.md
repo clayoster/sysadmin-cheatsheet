@@ -40,6 +40,7 @@
     - [Finding Disk Usage](#Finding-Disk-Usage)
     - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
     - [Miscellaneous](#Miscellaneous)
+- [Kubernetes](#Kubernetes)
 - [WSL - Windows Subsystem for Linux](#WSL---Windows-Subsystem-for-Linux)
   - [Disable Terminal Beep](#Disable-Terminal-Beep)
 
@@ -910,6 +911,100 @@ I usually use a combination of looking at running services in `systemctl list-un
         dmidecode -s system-manufacturer
         systemd-detect-virt
         virt-what
+
+# Kubernetes
+
+## Basic kubectl commands
+
+*These commands assume that a kubeconfig has been set (ex. `export KUBECONFIG=/path/to/your/kubeconfig`)*
+
+View all nodes in the cluster
+
+        kubectl get nodes
+
+View cluster component statuses (scheduler, controller-manager, etcd)
+
+        kubectl get componentstatuses
+
+View all pods in the cluster
+
+        kubectl get pods -A
+
+        # With more detail
+        kubectl get pods -A -o wide
+
+        # Watch for changes
+        kubectl get pods -A -o wide -w
+
+View all services in the cluster
+
+        kubectl get svc -A
+
+View all pods, services, and ingresses in the cluster
+
+        kubectl get pods,svc,ingress -A
+
+Follow the logs for a pod
+
+        kubectl logs -f -n <namespace name> <pod name>
+
+Follow the logs based on an application label
+
+        kubectl logs -f -n <namespace name> -l app=<app name>
+
+Edit a config map from the cli
+
+        # Find the configmap
+        kubectl get configmaps -A
+
+        # Edit the configmap
+        kubectl edit configmap -n <namespace name> <configmap name>
+
+Apply a Kubernetes manifest
+
+        kubectl apply -f manifest.yaml
+
+Restart a deployment
+
+        kubectl rollout restart deployment -n <namespace name> <deployment name>
+
+## Troubleshooting
+
+Launch a shell into running pod (assuming /bin/sh is available)
+
+        kubectl exec -it -n <namespace name> <pod name> -- /bin/sh
+
+Manually run a container in 'my-namespace' for debugging\
+*Using [Netshoot](https://hub.docker.com/r/nicolaka/netshoot) as the container image*
+
+        kubectl run -it debugging-pod --image=nicolaka/netshoot --restart=Never -n default -- sh
+
+        # Delete the pod after you are finished
+        kubectl delete pod debugging-pod -n my-namespace
+
+## Cilium troubleshooting
+
+- https://docs.cilium.io/en/stable/operations/troubleshooting/
+
+Find the cilium pod names
+
+        kubectl -n kube-system get pods -l k8s-app=cilium
+
+View cilium status
+
+        kubectl exec -it -n kube-system <cilium pod name> -- cilium-dbg status
+        
+Check hubble status
+
+        kubectl exec -it -n kube-system <cilium pod name> -- cilium-dbg status
+
+Follow all traffic flows with hubble
+
+        kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f
+
+Follow traffic flows for a specifc pod with hubble
+
+        kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f --pod <namespace name>/<pod name>
 
 # WSL - Windows Subsystem for Linux
 

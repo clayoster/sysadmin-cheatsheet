@@ -397,8 +397,9 @@ Troubleshoot a highstate run:
 
         salt-call -l debug state.apply
         
-Look-up job id:
+Look up recent job IDs and view the output of one:
 
+        salt-run jobs.list_jobs
         salt-run jobs.lookup_jid <job id number>
 
 Show currently running jobs:

@@ -664,6 +664,8 @@ List files within an RPM package
 `rpm -qlp <name>.rpm`
 - Installed RPM Package:\
 `rpm -ql <package name>`
+- Package in a configured repository that hasn't been installed:\
+`dnf repoquery --list <package name>`
 
 Determine the package a file comes from:
 

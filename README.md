@@ -12,6 +12,7 @@
   - [Testing Public-Facing Web Servers](#Testing-Public-Facing-Web-Servers)
   - [HTTPS Testing and Hardening Tools](#HTTPS-Testing-and-Hardening-Tools)
   - [Trusting a private Root CA in Linux](#Trusting-a-private-Root-CA-in-Linux)
+  - [Python SSL Trust Issues](#Python-SSL-Trust-Issues)
 - Web Servers
   - [Apache](#Apache)
   - [NGINX](#NGINX)
@@ -226,6 +227,35 @@ __RHEL__<br>
 Add private Root CA certificate files to `/etc/pki/ca-trust/source/anchors/`, then run this command:
 
         update-ca-trust extract
+
+### Python SSL Trust Issues
+
+If you are experiencing issues with the Python requests module not trusting SSL certificates, ensure the following environment variable is pointed to the correct CA bundle file
+
+        # Debian
+        REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+        
+        # RedHat
+        REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
+
+Example python script to test for SSL Trust issues with the requests module<br>
+
+```shell
+import requests
+
+def test_https_connection(url='https://google.com'):
+    try:
+        response = requests.get(url, timeout=5)
+        print(f"Status Code: {response.status_code}")
+        print("Connection Successful")
+    except requests.exceptions.SSLError as e:
+        print("SSL Error:", e)
+    except Exception as e:
+        print("Error:", e)
+
+if __name__ == "__main__":
+    test_https_connection()
+```
 
 # Web Servers
 

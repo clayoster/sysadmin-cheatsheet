@@ -781,20 +781,27 @@ Other Useful RHEL Links:
 - Red Hat CVE Database: https://access.redhat.com/security/security-updates/#/cve
 - RHEL Package Browser (Requires RHEL Account): https://access.redhat.com/downloads/content/package-browser
 
-Fix Yum if the command "hangs" and does not return output
+### RPM Database Corruption
+Fix yum/dnf if the command "hangs" and does not return output, or you receive errors that the RPM database is corrupted
 
-		Check for processes holding the RPM database open. Kill any processes that are listed
-			lsof | grep /var/lib/rpm
-		Delete the rpm db lock files
-			rm -f /var/lib/rpm/__*
-		Rebuild the RPM indexes
-			rpm -vv --rebuilddb
-		Verify the RPM database
-			cd /var/lib/rpm
-			/usr/lib/rpm/rpmdb_verify Packages
+```
+Check for processes holding the RPM database open. Kill any processes that are listed
+	lsof | grep /var/lib/rpm
+Make a backup of the RPM database before making changes
+	cp -a /var/lib/rpm /var/lib/rpm.bak
+Delete the RPM db lock files
+	rm -f /var/lib/rpm/__db*
+Rebuild the RPM indexes
+	rpm -vv --rebuilddb
+Verify the RPM database
+	cd /var/lib/rpm
+	/usr/lib/rpm/rpmdb_verify Packages
+Clean dnf cache
+ 	dnf clean all
 		
-		More Info Here
-		https://access.redhat.com/solutions/6903
+More Info Here
+https://access.redhat.com/solutions/6903
+```
 
 ## Linux Benchmarking
 The tools below can be found in Debian and RHEL repositories

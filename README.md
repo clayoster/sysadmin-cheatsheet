@@ -42,6 +42,8 @@
     - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
     - [Miscellaneous](#Miscellaneous)
 - [Kubernetes](#Kubernetes)
+    - [Cilium](#Cilium)
+    - [Flux](#Flux)
 - [WSL - Windows Subsystem for Linux](#WSL---Windows-Subsystem-for-Linux)
   - [Disable Terminal Beep](#Disable-Terminal-Beep)
 
@@ -797,7 +799,7 @@ Verify the RPM database
 	cd /var/lib/rpm
 	/usr/lib/rpm/rpmdb_verify Packages
 Clean dnf cache
- 	dnf clean all
+	dnf clean all
 		
 More Info Here
 https://access.redhat.com/solutions/6903
@@ -959,92 +961,132 @@ I usually use a combination of looking at running services in `systemctl list-un
 
 View all nodes in the cluster
 
-        kubectl get nodes
+	kubectl get nodes
 
 View cluster component statuses (scheduler, controller-manager, etcd)
 
-        kubectl get componentstatuses
+	kubectl get componentstatus
+
+	or
+
+	kubectl get --raw='/readyz?verbose'
 
 View all pods in the cluster
 
-        kubectl get pods -A
+	kubectl get pods -A
 
-        # With more detail
-        kubectl get pods -A -o wide
+	# All pods except the kube-system namespace
+	kubectl get pods --all-namespaces --field-selector metadata.namespace!=kube-system
 
-        # Watch for changes
-        kubectl get pods -A -o wide -w
+	# With more detail
+	kubectl get pods -A -o wide
+
+	# Watch for changes
+	kubectl get pods -A -o wide -w
 
 View all services in the cluster
 
-        kubectl get svc -A
+	kubectl get svc -A
 
 View all pods, services, and ingresses in the cluster
 
-        kubectl get pods,svc,ingress -A
+	kubectl get pods,svc,ingress -A
 
 Follow the logs for a pod
 
-        kubectl logs -f -n <namespace name> <pod name>
+	kubectl logs -f -n <namespace name> <pod name>
 
 Follow the logs based on an application label
 
-        kubectl logs -f -n <namespace name> -l app=<app name>
+	kubectl logs -f -n <namespace name> -l app=<app name>
 
 Edit a config map from the cli
 
-        # Find the configmap
-        kubectl get configmaps -A
+	# Find the configmap
+	kubectl get configmaps -A
 
-        # Edit the configmap
-        kubectl edit configmap -n <namespace name> <configmap name>
+	# Edit the configmap
+	kubectl edit configmap -n <namespace name> <configmap name>
 
 Apply a Kubernetes manifest
 
-        kubectl apply -f manifest.yaml
+	kubectl apply -f manifest.yaml
 
 Restart a deployment
 
-        kubectl rollout restart deployment -n <namespace name> <deployment name>
+	kubectl rollout restart deployment -n <namespace name> <deployment name>
 
 ## Troubleshooting
 
 Launch a shell into running pod (assuming /bin/sh is available)
 
-        kubectl exec -it -n <namespace name> <pod name> -- /bin/sh
+	kubectl exec -it -n <namespace name> <pod name> -- /bin/sh
 
 Manually run a container in 'my-namespace' for debugging\
 *Using [Netshoot](https://hub.docker.com/r/nicolaka/netshoot) as the container image*
 
-        kubectl run -it debugging-pod --image=nicolaka/netshoot --restart=Never -n default -- sh
+	kubectl run -it debugging-pod --image=nicolaka/netshoot --restart=Never -n default -- sh
 
-        # Delete the pod after you are finished
-        kubectl delete pod debugging-pod -n my-namespace
+	# Delete the pod after you are finished
+	kubectl delete pod debugging-pod -n my-namespace
 
-## Cilium troubleshooting
+Find all pods that are not owned by a controller (These cause issues with draining nodes)
+
+	kubectl get pods --all-namespaces -o json | jq -r '.items[] | select(.metadata.ownerReferences == null) | [.kind, .metadata.namespace, .metadata.name, .spec.nodeName] | @tsv'
+
+Run in a loop to delete the pods without controllers across all cluster nodes
+
+	# Find and delete pods without controllers defined
+	while read kind namespace name node; do
+	    kubectl delete pod "$name" -n "$namespace" --force --grace-period 1
+	done < <$(kubectl get pods --all-namespaces -o json | jq -r '.items[] | select(.metadata.ownerReferences == null) | [.kind, .metadata.namespace, .metadata.name, .spec.nodeName] | @tsv')
+
+View the events occurring across the cluster
+
+	kubectl get events -A
+
+## Cilium
 
 - https://docs.cilium.io/en/latest/cheatsheet/
 - https://docs.cilium.io/en/stable/operations/troubleshooting/
 
+Check cilium status from the cilium-cli tool (assuming it is installed)
+
+	cilium status
+
 Find the cilium pod names
 
-        kubectl -n kube-system get pods -l k8s-app=cilium
+	kubectl -n kube-system get pods -l k8s-app=cilium
 
 View cilium status
 
-        kubectl exec -it -n kube-system <cilium pod name> -- cilium-dbg status
+	kubectl exec -it -n kube-system <cilium pod name> -- cilium-dbg status
         
 Check hubble status
 
-        kubectl exec -it -n kube-system <cilium pod name> -- cilium-dbg status
+	kubectl exec -it -n kube-system <cilium pod name> -- cilium-dbg status
 
 Follow all traffic flows with hubble
 
-        kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f
+	kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f
 
 Follow traffic flows for a specifc pod with hubble
 
-        kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f --pod <namespace name>/<pod name>
+	kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f --pod <namespace name>/<pod name>
+
+## Flux
+
+List all flux-managed resources across all namespaces
+
+	flux get all -A
+
+Reconcile a specific kustomization
+
+	flux reconcile kustomization <kustomization-name>
+
+Follow the flux controller logs
+
+	kubectl logs -f -n flux-system deploy/notification-controller
 
 # WSL - Windows Subsystem for Linux
 

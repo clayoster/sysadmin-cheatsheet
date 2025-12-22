@@ -55,7 +55,7 @@
 
 This command will display the TLS/SSL protocols that the web server supports:
 
-	nmap --script ssl-enum-ciphers -p 443 server.example.com`
+	nmap --script ssl-enum-ciphers -p 443 server.example.com
 
 ```
 Starting Nmap 7.40 ( https://nmap.org ) at 2020-11-02 19:53 CST

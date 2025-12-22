@@ -1020,7 +1020,7 @@ Restart a deployment
 
 ## Misc
 
-Generate a secret for authentication to a container registry. It will print a manifest like the one below that can be configured in the appropriate namespace and used for `imagePullSecrets` for pulling container images.
+Generate a secret for authentication to a container registry. It will print a secret manifest that can be configured in the appropriate namespace and used for `imagePullSecrets` for pulling container images.
 
 ```shell
 kubectl create secret docker-registry registry-auth-secret-name \
@@ -1030,17 +1030,6 @@ kubectl create secret docker-registry registry-auth-secret-name \
   --docker-email=k8s-deploy@app.example.com \
   --namespace=yournamespacehere \
   --dry-run=client -o yaml
-```
-
-```yaml
-apiVersion: v1
-data:
-  .dockerconfigjson: eyJhdXRocyI6eyJnaXQuZXhhbXBsZS5jb20iOnsidXNlcm5hbWUiOiJpbnNlcnR1c2VybmFtZWhlcmUiLCJwYXNzd29yZCI6Imluc2VydHBhc3N3b3JkaGVyZSIsImVtYWlsIjoiazhzLWRlcGxveUBhcHAuZXhhbXBsZS5jb20iLCJhdXRoIjoiYVc1elpYSjBkWE5sY201aGJXVm9aWEpsT21sdWMyVnlkSEJoYzNOM2IzSmthR1Z5WlE9PSJ9fX0=
-kind: Secret
-metadata:
-  name: registry-auth-secret-name
-  namespace: yournamespacehere
-type: kubernetes.io/dockerconfigjson
 ```
 
 Print a CSV list of namespaces and the container images running within them

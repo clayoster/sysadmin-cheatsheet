@@ -1016,6 +1016,43 @@ Restart a deployment
 
 	kubectl rollout restart deployment -n <namespace name> <deployment name>
 
+## Misc
+
+Generate a secret for authentication to a container registry. It will print a manifest like the one below that can be configured in the appropriate namespace and used for `imagePullSecrets` for pulling container images.
+
+```shell
+kubectl create secret docker-registry registry-auth-secret-name \
+  --docker-server=git.example.com \
+  --docker-username=insertusernamehere \
+  --docker-password=insertpasswordhere \
+  --docker-email=k8s-deploy@app.example.com \
+  --namespace=yournamespacehere \
+  --dry-run=client -o yaml
+```
+
+```yaml
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJnaXQuZXhhbXBsZS5jb20iOnsidXNlcm5hbWUiOiJpbnNlcnR1c2VybmFtZWhlcmUiLCJwYXNzd29yZCI6Imluc2VydHBhc3N3b3JkaGVyZSIsImVtYWlsIjoiazhzLWRlcGxveUBhcHAuZXhhbXBsZS5jb20iLCJhdXRoIjoiYVc1elpYSjBkWE5sY201aGJXVm9aWEpsT21sdWMyVnlkSEJoYzNOM2IzSmthR1Z5WlE9PSJ9fX0=
+kind: Secret
+metadata:
+  name: registry-auth-secret-name
+  namespace: yournamespacehere
+type: kubernetes.io/dockerconfigjson
+```
+
+Print a CSV list of namespaces and the container images running within them
+
+```shell
+kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{","}{range .spec.containers[*]}{.image}{" "}{end}{"\n"}' | sort | uniq
+```
+
+Determine which pod that a filesystem path beneath like /var/lib/kubelet/pods/<pod-uid>/path/to/file relates to
+
+```shell
+kubectl get pods -n <namespace> -o custom-columns=NAME:.metadata.name,UID:.metadata.uid | grep <pod-uid>
+```
+
 ## Troubleshooting
 
 Launch a shell into running pod (assuming /bin/sh is available)
@@ -1073,6 +1110,28 @@ Follow all traffic flows with hubble
 Follow traffic flows for a specifc pod with hubble
 
 	kubectl exec -it -n kube-system <cilium pod name> -- hubble observe -f --pod <namespace name>/<pod name>
+
+Using the cilium-cli and hubble commands (installed via brew or other)
+<br>
+[Hubble Documentation](https://docs.cilium.io/en/stable/operations/troubleshooting/#observing-flows-with-hubble)
+
+	# Forward hubble to a port on your local system so you can run hubble commands
+	cilium hubble port-forward
+
+	# View traffic flows
+	hubble observe -f
+
+	# Watch traffic in specific namespaces on a multiple ports
+	hubble observe -f -n namespace1 -n namespace2 --port 80 --port 443
+
+	# Watch for dropped traffic in a cluster (Indication of network policy not allowing the connection)
+	hubble observe -f -n namespace1 --port 443 --type drop
+
+Launch the Hubble Web UI - Visualizes traffic flows (filters for namespace and action)
+<br>
+*Automatically launches the page in a web browser*
+
+	cilium hubble ui
 
 ## Flux
 

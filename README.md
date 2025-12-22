@@ -55,31 +55,33 @@
 
 This command will display the TLS/SSL protocols that the web server supports:
 
-`nmap --script ssl-enum-ciphers -p 443 server.example.com`
-        
-                Starting Nmap 7.40 ( https://nmap.org ) at 2020-11-02 19:53 CST
-                Nmap scan report for server.example.com (192.168.50.50)
-                Host is up (0.0034s latency).
-                PORT    STATE SERVICE
-                443/tcp open  https
-                | ssl-enum-ciphers:
-                |   TLSv1.2:
-                |     ciphers:
-                |       TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (secp256r1) - A
-                |       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 (secp256r1) - A
-                |       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (secp256r1) - A
-                |       TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 (dh 2048) - A
-                |       TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 (dh 2048) - A
-                |       TLS_DHE_RSA_WITH_AES_256_CBC_SHA (dh 2048) - A
-                |     compressors:
-                |       NULL
-                |     cipher preference: server
-                |     warnings:
-                |       Key exchange (dh 2048) of lower strength than certificate key
-                |       Key exchange (secp256r1) of lower strength than certificate key
-                |_  least strength: A
-                
-                Nmap done: 1 IP address (1 host up) scanned in 0.78 seconds
+	nmap --script ssl-enum-ciphers -p 443 server.example.com`
+
+```
+Starting Nmap 7.40 ( https://nmap.org ) at 2020-11-02 19:53 CST
+Nmap scan report for server.example.com (192.168.50.50)
+Host is up (0.0034s latency).
+PORT    STATE SERVICE
+443/tcp open  https
+| ssl-enum-ciphers:
+|   TLSv1.2:
+|     ciphers:
+|       TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (secp256r1) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 (secp256r1) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (secp256r1) - A
+|       TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 (dh 2048) - A
+|       TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 (dh 2048) - A
+|       TLS_DHE_RSA_WITH_AES_256_CBC_SHA (dh 2048) - A
+|     compressors:
+|       NULL
+|     cipher preference: server
+|     warnings:
+|       Key exchange (dh 2048) of lower strength than certificate key
+|       Key exchange (secp256r1) of lower strength than certificate key
+|_  least strength: A
+
+Nmap done: 1 IP address (1 host up) scanned in 0.78 seconds
+```
 
 ## Scanning for Certificate Usage and Expiration By Subnet
 
@@ -87,14 +89,14 @@ This command will scan the specified subnet and look for certificates on the com
 
 This will only find certificates that are configured for the IP or the default server. If there are multiple sites / vhosts at the IP address configured with SNI, they will not be found with this command.
 
-        nmap -p 443,8443 -sV -sC 172.21.0.0/24 | grep -E '(Nmap scan report|[0-9]+/tcp|ssl-cert|Subject Alternative Name|Not valid after)'
+	nmap -p 443,8443 -sV -sC 172.21.0.0/24 | grep -E '(Nmap scan report|[0-9]+/tcp|ssl-cert|Subject Alternative Name|Not valid after)'
 
 ## Validating Certificate Files
 
 Test connecting using TLSv1.2 and TLSv1.3
 
-        curl -vI --tlsv1.2 https://server.example.com
-        curl -vI --tlsv1.3 https://server.example.com
+	curl -vI --tlsv1.2 https://server.example.com
+	curl -vI --tlsv1.3 https://server.example.com
 
 From https://www.sslshopper.com/article-most-common-openssl-commands.html
 

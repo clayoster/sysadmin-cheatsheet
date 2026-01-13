@@ -35,6 +35,7 @@
 - [Linux - Useful Commands](#Linux---Useful-Commands)
   - [Debian](#Debian)
   - [RHEL](#RHEL)
+  - [Systemd](#Systemd)
   - [Linux Benchmarking](#Linux-Benchmarking)
   - [Linux Storage](#Linux-Storage)
     - [Rescan the SCSI Bus](#Rescan-the-SCSI-Bus)
@@ -805,6 +806,16 @@ Clean dnf cache
 		
 More Info Here
 https://access.redhat.com/solutions/6903
+```
+
+## Systemd
+
+Viewing the memory usage of a unit
+- MemoryCurrent - Current memory usage
+- MemoryPeak - Peak memory usage (not always available)
+- MemoryMax - Memory limit (`infinity` if there is no limit)
+```shell
+systemctl show <unit name> -p MemoryCurrent -p MemoryPeak -p MemoryMax
 ```
 
 ## Linux Benchmarking

@@ -125,10 +125,17 @@ If you want to trust the certificate, you can add it to your CA certificate stor
 (Info taken from https://kb.wisc.edu/page.php?id=4064)
 
 Make sure the output of these 3 commands is the same. If so, then the Certificate / private key / csr match:
+```shell
+openssl x509 -noout -modulus -in server.crt | openssl md5
+openssl rsa -noout -modulus -in server.key | openssl md5
+openssl req -noout -modulus -in server.csr | openssl md5
+```
 
-        openssl x509 -noout -modulus -in server.crt | openssl md5
-        openssl rsa -noout -modulus -in server.key | openssl md5
-        openssl req -noout -modulus -in server.csr | openssl md5
+You can also test the cert and key within a pkcs12 file to see if they match the 3 above
+```shell
+openssl pkcs12 -in server.p12 -clcerts -nokeys | openssl x509 -noout -modulus | openssl md5
+openssl pkcs12 -in server.p12 -nocerts -nodes | openssl rsa -noout -modulus | openssl md5
+```
 
 #### Info that expands upon the above:
 The private key contains a series of numbers. Two of those numbers form the "public key", the others are part of your "private key". The "public key" bits are also embedded in your Certificate (we get them from your CSR). To check that the public key in your cert matches the public portion of your private key, you need to view the cert and the key and compare the numbers. To view the Certificate and the key run the commands:

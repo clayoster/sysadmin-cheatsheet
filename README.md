@@ -57,10 +57,11 @@
 ## SSL Testing
 
 This command will display the TLS/SSL protocols that the web server supports:
-
-	nmap --script ssl-enum-ciphers -p 443 server.example.com
-
+```shell
+nmap --script ssl-enum-ciphers -p 443 server.example.com
 ```
+Example output:
+```yaml
 Starting Nmap 7.40 ( https://nmap.org ) at 2020-11-02 19:53 CST
 Nmap scan report for server.example.com (192.168.50.50)
 Host is up (0.0034s latency).
@@ -91,27 +92,30 @@ Nmap done: 1 IP address (1 host up) scanned in 0.78 seconds
 This command will scan the specified subnet and look for certificates on the common HTTPS ports 443 and 8443, then filter the output to include the subject, subject alternative name, and expiration timestamp.
 
 This will only find certificates that are configured for the IP or the default server. If there are multiple sites / vhosts at the IP address configured with SNI, they will not be found with this command.
-
-	nmap -p 443,8443 -sV -sC 172.21.0.0/24 | grep -E '(Nmap scan report|[0-9]+/tcp|ssl-cert|Subject Alternative Name|Not valid after)'
+```shell
+nmap -p 443,8443 -sV -sC 172.21.0.0/24 | grep -E '(Nmap scan report|[0-9]+/tcp|ssl-cert|Subject Alternative Name|Not valid after)'
+```
 
 ## Validating Certificate Files
 
-Test connecting using TLSv1.2 and TLSv1.3
-
-	curl -vI --tlsv1.2 https://server.example.com
-	curl -vI --tlsv1.3 https://server.example.com
+Test certificates on a web server using TLSv1.2 and TLSv1.3
+```shell
+curl -vI --tlsv1.2 https://server.example.com
+curl -vI --tlsv1.3 https://server.example.com
+```
 
 From https://www.sslshopper.com/article-most-common-openssl-commands.html
+```shell
+# Check a Certificate Signing Request (CSR)
+openssl req -text -noout -verify -in CSR.csr
+# Check a private key
+openssl rsa -in privateKey.key -check
+# Check a certificate
+openssl x509 -in certificate.crt -text -noout
+# Check a PKCS#12 file (.pfx or .p12)
+openssl pkcs12 -info -in keyStore.p12
+```
 
-        Check a Certificate Signing Request (CSR)
-                openssl req -text -noout -verify -in CSR.csr
-        Check a private key
-                openssl rsa -in privateKey.key -check
-        Check a certificate
-                openssl x509 -in certificate.crt -text -noout
-        Check a PKCS#12 file (.pfx or .p12)
-                openssl pkcs12 -info -in keyStore.p12
-        
 If you use the 'openssl' tool, this is one way to get extract the CA cert for a particular server. This will show the certificate and also evaluate the certificate to show it's details. (using webserver.example.com as an example):
 
         openssl s_client -connect webserver.example.com:443 -servername webserver.example.com </dev/null | openssl x509 -text
@@ -139,25 +143,29 @@ openssl pkcs12 -in server.p12 -nocerts -nodes | openssl rsa -noout -modulus | op
 
 #### Info that expands upon the above:
 The private key contains a series of numbers. Two of those numbers form the "public key", the others are part of your "private key". The "public key" bits are also embedded in your Certificate (we get them from your CSR). To check that the public key in your cert matches the public portion of your private key, you need to view the cert and the key and compare the numbers. To view the Certificate and the key run the commands:
+```shell
+openssl x509 -noout -text -in server.crt
+openssl rsa -noout -text -in server.key
+```
 
-        openssl x509 -noout -text -in server.crt
-        openssl rsa -noout -text -in server.key
-        
 The 'modulus' and the 'public exponent' portions in the key and the Certificate must match. But since the public exponent is usually 65537 and it's bothering comparing long modulus you can use the following approach:
-
-        openssl x509 -noout -modulus -in server.crt | openssl md5
-        openssl rsa -noout -modulus -in server.key | openssl md5
+```shell
+openssl x509 -noout -modulus -in server.crt | openssl md5
+openssl rsa -noout -modulus -in server.key | openssl md5
+```
 
 ### Generate a private key
-
-        openssl genrsa -out SERVER.key 4096
+```shell
+openssl genrsa -out SERVER.key 4096
+```
 
 ### Generate a CSR
 
 #### Generating a CSR with a SubjectAlternativeName included in a single line command (This requires that the /etc/ssl/openssl.cnf file exists - Tested on Debian):
-        
-        openssl req -new -sha256 -key SERVER.key -subj "/C=US/ST=State Name/localityName=City Name/O=Example Inc/emailAddress=youremail@example.com/CN=SERVER.example.com" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:SERVER.example.com,DNS:www.SERVER.example.com,IP:0.0.0.0")) -out SERVER.csr
-        
+```shell        
+openssl req -new -sha256 -key SERVER.key -subj "/C=US/ST=State Name/localityName=City Name/O=Example Inc/emailAddress=youremail@example.com/CN=SERVER.example.com" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:SERVER.example.com,DNS:www.SERVER.example.com,IP:0.0.0.0")) -out SERVER.csr
+```
+
 #### Links with related info:
 https://bugs.chromium.org/p/chromium/issues/detail?id=700595&desc=2
 https://bugs.chromium.org/p/chromium/issues/detail?id=308330
@@ -165,14 +173,14 @@ https://security.stackexchange.com/questions/74345/provide-subjectaltname-to-ope
 https://alexanderzeitler.com/articles/Fixing-Chrome-missing_subjectAltName-selfsigned-cert-openssl/
 
 #### Generate a CSR without specifying the SubjectAlternativeName attribute (Fine when submitting a request to a public CA)
-
-`openssl req -new -sha256 -key SERVER.key -out SERVER.csr`
-
-        Country Name (2 letter code) [AU]:US
-        State or Province Name (full name) [Some-State]:State Name
-        Locality Name (eg, city) []:City name
-        Organization Name (eg, company) [Internet Widgits Pty Ltd]:Example Inc
-        Organizational Unit Name (eg, section) []:IT Department
+```shell
+openssl req -new -sha256 -key SERVER.key -out SERVER.csr
+Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:State Name
+Locality Name (eg, city) []:City name
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Example Inc
+Organizational Unit Name (eg, section) []:IT Department
+```
 
 ### Request Certificate from an Active Directory CA
 
@@ -206,20 +214,23 @@ Example:
 Windows Servers tend to want the cert/key files in a pfx/pkcs12 format. Use these commands to create a pfx/pkcs12 file from PEM format key/cert files.
 
 Create PFX/PKCS12 with friendlyname (-name):
-
-        openssl pkcs12 -export -out filename.p12 -inkey key-filename.key -in cert-filename.crt -name "friendlyname text" 
+```shell
+openssl pkcs12 -export -out filename.p12 -inkey key-filename.key -in cert-filename.crt -name "friendlyname text" 
+```
 
 Create PFX/PKCS12 file with friendlyname (-name) and include cert chain file (-certfile):
-
-        openssl pkcs12 -export -out filename.p12 -inkey key-filename.key -in cert-filename.crt -certfile cacert-filename.crt -name "friendlyname text" 
+```shell
+openssl pkcs12 -export -out filename.p12 -inkey key-filename.key -in cert-filename.crt -certfile cacert-filename.crt -name "friendlyname text" 
+```
 
 ### Extract Certificate from PFX/PKCS12 file:
-
-        openssl pkcs12 -in filename.p12 -nokeys -out cert-filename.crt
-
+```shell
+openssl pkcs12 -in filename.p12 -nokeys -out cert-filename.crt
+```
 ### Extract Key from PFX/PKCS12 file:
-
-        openssl pkcs12 -in filename.p12 -nocerts -nodes -out key-filename.key 
+```shell
+openssl pkcs12 -in filename.p12 -nocerts -nodes -out key-filename.key 
+```
 
 ### Testing Public-Facing Web Servers
 - Use https://ssllabs.com to test TLS configuration
@@ -234,23 +245,26 @@ Create PFX/PKCS12 file with friendlyname (-name) and include cert chain file (-c
 
 __Debian__<br>
 Add private Root CA certificate files to `/usr/local/share/ca-certificates/`, then run this command:
-
-        update-ca-certificates
+```shell
+update-ca-certificates
+```
 
 __RHEL__<br>
 Add private Root CA certificate files to `/etc/pki/ca-trust/source/anchors/`, then run this command:
-
-        update-ca-trust extract
+```shell
+update-ca-trust extract
+```
 
 ### Python SSL Trust Issues
 
 If you are experiencing issues with the Python requests module not trusting SSL certificates, ensure the following environment variable is pointed to the correct CA bundle file
+```shell
+# Debian
+REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
-        # Debian
-        REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-        
-        # RedHat
-        REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
+# RedHat
+REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
+```
 
 Example python script to test for SSL Trust issues with the requests module<br>
 

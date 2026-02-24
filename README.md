@@ -44,6 +44,7 @@
     - [Miscellaneous](#Miscellaneous)
 - [Kubernetes](#Kubernetes)
     - [Cilium](#Cilium)
+    - [Kustomize](#Kustomize)
     - [Flux](#Flux)
 - [WSL - Windows Subsystem for Linux](#WSL---Windows-Subsystem-for-Linux)
   - [Disable Terminal Beep](#Disable-Terminal-Beep)
@@ -1134,6 +1135,23 @@ Launch the Hubble Web UI - Visualizes traffic flows (filters for namespace and a
 *Automatically launches the page in a web browser*
 
 	cilium hubble ui
+
+## Kustomize
+
+Test building kustomize paths:
+```shell
+kubectl kustomize path/to/kustomization
+```
+
+Only show a manifest with a specific name from the kustomization:
+```shell
+kubectl kustomize path/to/kustomization | yq eval 'select(.metadata.name == "name-of-manifest")'
+```
+
+Show multiple manifests with different names from the kustomization:
+```shell
+kubectl kustomize path/to/kustomization | yq eval 'select(.metadata.name == "name-of-manifest" or .metadata.name == "name-of-second-manifest")'
+```
 
 ## Flux
 

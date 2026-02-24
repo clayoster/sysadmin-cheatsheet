@@ -35,6 +35,7 @@
 - [Linux - Useful Commands](#Linux---Useful-Commands)
   - [Debian](#Debian)
   - [RHEL](#RHEL)
+  - [SSH](#SSH)
   - [Systemd](#Systemd)
   - [Linux Benchmarking](#Linux-Benchmarking)
   - [Linux Storage](#Linux-Storage)
@@ -807,6 +808,39 @@ Clean dnf cache
 		
 More Info Here
 https://access.redhat.com/solutions/6903
+```
+
+## SSH
+Bash configuration for configuring your SSH agent for `~/.ssh/id_rsa` and proxying connections to servers through a basion host / jump box: \
+*The jumpbox must be configured to allow ssh agent forwarding*
+
+Add to `~/.bashrc`
+``` shell
+# Set up SSH Auth Agent and Key
+SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.sock"
+export SSH_AUTH_SOCK
+
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+    rm -f "$SSH_AUTH_SOCK"
+    ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
+fi
+
+if ! ssh-add -l | grep '.ssh/id_rsa' > /dev/null; then
+    ssh-add ~/.ssh/id_rsa
+fi
+```
+Add to `~/.ssh/config`
+```
+Host jumpbox
+    Hostname jumpbox
+    User username
+    ForwardAgent yes
+
+# Adjust server???? to match your naming convention
+Host server???? !jumpbox
+    Hostname %h
+    User username
+    ProxyJump jumpbox
 ```
 
 ## Systemd

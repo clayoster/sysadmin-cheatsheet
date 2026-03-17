@@ -44,6 +44,8 @@
     - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
     - [Miscellaneous](#Miscellaneous)
 - [Kubernetes](#Kubernetes)
+    - [Kubectl](#Kubectl)
+    - [Helm](#Helm)
     - [Cilium](#Cilium)
     - [Kustomize](#Kustomize)
     - [Flux](#Flux)
@@ -1024,7 +1026,7 @@ I usually use a combination of looking at running services in `systemctl list-un
 
 # Kubernetes
 
-## Basic kubectl commands
+## Kubectl
 
 *These commands assume that a kubeconfig has been set (ex. `export KUBECONFIG=/path/to/your/kubeconfig`)*
 
@@ -1061,6 +1063,10 @@ View all pods, services, and ingresses in the cluster
 
 	kubectl get pods,svc,ingress -A
 
+List all api resources (kinds) with verbs
+
+	kubectl api-resources -o wide
+
 Follow the logs for a pod
 
 	kubectl logs -f -n <namespace name> <pod name>
@@ -1084,6 +1090,11 @@ Apply a Kubernetes manifest
 Restart a deployment
 
 	kubectl rollout restart deployment -n <namespace name> <deployment name>
+
+Map local port to a port within a pod for direct access\
+*local port 8080, pod port 80*
+
+	kubectl port-forward nginx-pod-0 8080:80
 
 ## Misc
 
@@ -1139,6 +1150,33 @@ Run in a loop to delete the pods without controllers across all cluster nodes
 View the events occurring across the cluster
 
 	kubectl get events -A
+
+## Helm
+
+Show the versions of a chart in a helm repo
+
+	helm search repo helm-repo-name/chart-name --versions
+
+Show the values that were supplied with an existing helm deployment
+
+	helm get values helm-deployment-name -n namespace
+
+	# Output the values to a file
+	helm get values rancher -n cattle-system -o yaml > values.yaml
+
+Output the manifests that are currently managed by a helm deployment
+
+	helm get manifest helm-deployment-name -n namespace
+
+Apply a helm chart using a values file
+
+	helm upgrade helm-deployment-name helm-repo/helm-chart -n namespace --version=X.X.X -f values.yaml
+
+Download and unpack a helm chart, edit something and apply the modified version
+
+	helm fetch helm-repo/helm-chart --version=X.X.X --untar
+	# edit the file(s) you need to inside the helm-chart directory
+	helm upgrade helm-deployment-name ./helm-chart --version=X.X.X -n namespace
 
 ## Cilium
 

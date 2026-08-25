@@ -1024,6 +1024,55 @@ I usually use a combination of looking at running services in `systemctl list-un
         systemd-detect-virt
         virt-what
 
+# Containers
+## Container Hardening
+Use the examples below to add container hardening. Beware these settings will probably break things.
+
+### Docker Compose - Add these settings
+```yaml
+    # Hardening settings
+    read_only: true
+    privileged: false
+    cap_drop:
+      - ALL
+    # If necessary, add capabilities back in
+    #cap_add:
+    #  - See https://man7.org/linux/man-pages/man7/capabilities.7.html) for options
+    security_opt:
+      - 'no-new-privileges=true'
+    # Necessary if the app needs to write to /tmp
+    #tmpfs:
+    #  - /tmp
+```
+### Kubernetes Pod Manifests - Add these settings 
+```yaml
+   spec:
+      containers:
+        - name: example
+          image: alpine:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              # If necessary, add capabilities back in
+              #add:
+              #  - See https://man7.org/linux/man-pages/man7/capabilities.7.html) for options
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+```
+
+
 # Kubernetes
 
 ## Kubectl
@@ -1033,6 +1082,10 @@ I usually use a combination of looking at running services in `systemctl list-un
 View all nodes in the cluster
 
 	kubectl get nodes
+
+View all nodes in a cluster with their CPU and Memory capacities
+
+	kubectl get nodes -o custom-columns=NAME:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory
 
 View cluster component statuses (scheduler, controller-manager, etcd)
 
@@ -1098,6 +1151,8 @@ Map local port to a port within a pod for direct access\
 
 ## Misc
 
+#### Create a Secret for imagePullSecrets
+
 Generate a secret for authentication to a container registry. It will print a secret manifest that can be configured in the appropriate namespace and used for `imagePullSecrets` for pulling container images.
 
 ```shell
@@ -1105,18 +1160,21 @@ kubectl create secret docker-registry registry-auth-secret-name \
   --docker-server=git.example.com \
   --docker-username=insertusernamehere \
   --docker-password=insertpasswordhere \
-  --docker-email=k8s-deploy@app.example.com \
   --namespace=yournamespacehere \
   --dry-run=client -o yaml
 ```
 
-Print a CSV list of namespaces and the container images running within them
+#### View all pods in a namespace with their container images
+```shell
+kubectl get pods -n <namespace> -o custom-columns='POD:.metadata.name,NODE:.spec.nodeName,IMAGE:.spec.containers[*].image,IMAGE_ID:.status.containerStatuses[*].imageID'
+```
+#### Print a CSV list of namespaces and the container images running within them
 
 ```shell
 kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{","}{range .spec.containers[*]}{.image}{" "}{end}{"\n"}' | sort | uniq
 ```
 
-Determine which pod that a filesystem path beneath like /var/lib/kubelet/pods/<pod-uid>/path/to/file relates to
+#### Determine which pod that a filesystem path beneath like `/var/lib/kubelet/pods/\<pod-uid>/path/to/file` relates to
 
 ```shell
 kubectl get pods -n <namespace> -o custom-columns=NAME:.metadata.name,UID:.metadata.uid | grep <pod-uid>
@@ -1151,6 +1209,12 @@ View the events occurring across the cluster
 
 	kubectl get events -A
 
+Testing RBAC that is applying to a service account
+
+```shell
+kubectl auth can-i delete replicaset/testing -n testing --as=system:serviceaccount:test-service-account
+```
+
 ## Helm
 
 Show the versions of a chart in a helm repo
@@ -1177,6 +1241,37 @@ Download and unpack a helm chart, edit something and apply the modified version
 	helm fetch helm-repo/helm-chart --version=X.X.X --untar
 	# edit the file(s) you need to inside the helm-chart directory
 	helm upgrade helm-deployment-name ./helm-chart --version=X.X.X -n namespace
+
+Output the CRDs from a specific helm chart version
+
+        helm repo update
+        helm search repo helm-repo-name/chart-name --versions
+        helm show crds helm-repo-name/chart-name --version x.x.x
+
+Helm Chart Creation Commands
+```shell
+# Scaffold helm project called "helm-test"
+helm create helm-test
+
+cd helm-test
+
+# Edit files within the chart directory
+# https://helm.sh/docs/topics/charts/#the-chart-file-structure
+
+# Test that the chart is well formed
+helm lint
+
+# Locally render the template
+helm template my-release .
+
+# Enable verbose output
+helm template my-release . --debug
+
+# Package the chart
+# The chart and app version numbers come from the Chart.yml file at the root of the chart directory
+cd ..
+helm package helm-test/
+```
 
 ## Cilium
 
@@ -1244,6 +1339,16 @@ kubectl kustomize path/to/kustomization | yq eval 'select(.metadata.name == "nam
 Show multiple manifests with different names from the kustomization:
 ```shell
 kubectl kustomize path/to/kustomization | yq eval 'select(.metadata.name == "name-of-manifest" or .metadata.name == "name-of-second-manifest")'
+```
+
+Only show kustomizations of the "kind" of Namespace:
+```shell
+kubectl kustomize path/to/kustomization | yq eval 'select(.kind == "Namespace")'
+```
+
+Sort YAML documents by .metadata.name using yq
+```shell
+kubectl kustomize path/to/kustomization | yq eval '(.kind = "Namespace")' | yq eval-all '. as $item ireduce ([]; . + [$item]) | sort_by(.metadata.name)[]'
 ```
 
 ## Flux

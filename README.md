@@ -1170,12 +1170,16 @@ I usually use a combination of looking at running services in `systemctl list-un
 
 ## IPMI
 
-ipmitool commands
+### ipmitool commands
+*Can be run on the same system as the OOBM is located on*
 ```shell
-# Can be run on the same system as the OOBM is located on
+# View the system event log
 ipmitool sel list
+# Clear the system event log
 ipmitool sel clear
+# View hardware sensor readings
 ipmitool sensor list
+# Perform a cold reset of the BMC
 ipmitool mc reset cold
 ```
 

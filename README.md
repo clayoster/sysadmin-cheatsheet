@@ -127,8 +127,9 @@ openssl pkcs12 -info -in keyStore.p12
 ```
 
 If you use the 'openssl' tool, this is one way to get extract the CA cert for a particular server. This will show the certificate and also evaluate the certificate to show it's details. (using webserver.example.com as an example):
-
-        openssl s_client -connect webserver.example.com:443 -servername webserver.example.com </dev/null | openssl x509 -text
+```shell
+openssl s_client -connect webserver.example.com:443 -servername webserver.example.com </dev/null | openssl x509 -text
+```
 
 The certificate will have "BEGIN CERTIFICATE" and "END CERTIFICATE" markers, and it's details are above the certificate.
 
@@ -299,32 +300,35 @@ if __name__ == "__main__":
 
 ## Apache
 Print the current Apache config
-
-        apachectl -S
+```shell
+apachectl -S
+```
 
 Test the current Apache config for errors
-
-        apachectl configtest
+```shell
+apachectl configtest
+```
 
 List loaded apache modules
-
-        apachectl -M
+```shell
+apachectl -M
+```
 
 ## NGINX
 Print the current NGINX config
-
-        nginx -T
+```shell
+nginx -T
+```
 
 Test the NGINX config file for errors
-
-        nginx -t
+```shell
+nginx -t
+```
 
 # DNS
 
 ## Query for Active Directory Domain Controller SRV records
-Example using dig:
-
-`dig srv _ldap._tcp.dc._msdcs.example.com`
+Example using `dig` to find SRV records for the `example.com` domain:
 
         user@workstation:~$ dig +noall +answer srv _ldap._tcp.dc._msdcs.example.com
         _ldap._tcp.dc._msdcs.example.com. 536   IN SRV  0 100 389 dc1.example.com.
@@ -375,24 +379,27 @@ Info gathered from:
 # Git
 
 #### List Remotes
-
-        git remote -v 
+```shell
+git remote -v 
+```
 
 #### Clean changes from repo including files that match .gitignore
-
-        git clean -Xdf
+```shell
+git clean -Xdf
+```
 
 #### Add execute permissions to a file in a git repository
+```shell
+# Show permissions of files in the current directory of the repository
+git ls-files --stage
 
-        # Show permissions of files in the current directory of the repository
-        git ls-files --stage
+# Add the execute permission to script.sh
+git update-index --chmod=+x script.sh
 
-        # Add the execute permission to script.sh
-        git update-index --chmod=+x script.sh
-
-        # Add commit message and push
-        git commit -m "Add execute permission to script.sh"
-        git push
+# Add commit message and push
+git commit -m "Add execute permission to script.sh"
+git push
+```
 
 ## Debugging git CLI comamnds
 
@@ -402,24 +409,29 @@ Info gathered from:
 - In Windows (Powershell): `$env:GIT_TRACE=1
 
 ### Increase the verbosity of the git SSH command
-        GIT_SSH_COMMAND="ssh -vvv" git fetch
+```shell
+GIT_SSH_COMMAND="ssh -vvv" git fetch
+```
 
 ### The loglevel can be turned up on per host in `~/.ssh/config`:
-
-        Host github.com
-                LogLevel DEBUG3
-
+```shell
+Host github.com
+        LogLevel DEBUG3
+```
 ### Show all current configuration
-
-        git config --global --list
+```shell
+git config --global --list
+```
 
 ## Gitlab Specific
 
 ### Generate list of active users and email addresses from Gitlab API
 I used this API query once in a while to grab the e-mail addresses of all active users on a Gitlab instance.
 
-        curl -L --header "PRIVATE-TOKEN: <REPLACE WITH VALID TOKEN>" "https://gitlab.example.com/api/v4/users?active=true&per_page=500" | jq -r '.[] | .email' | sort
-        
+```shell
+curl -L --header "PRIVATE-TOKEN: <REPLACE WITH VALID TOKEN>" "https://gitlab.example.com/api/v4/users?active=true&per_page=500" | jq -r '.[] | .email' | sort
+```
+
 Documentation:
 https://docs.gitlab.com/ee/api/users.html
 
@@ -431,9 +443,10 @@ https://docs.gitlab.com/17.0/ee/user/project/repository/reducing_the_repo_size_u
 *This requires the git-filter-repo package which is only available in Debian 10+ and Ubuntu 22+. Alternatively, it can be [downloaded directly from the source repository](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md#simple-installation) and ran with `python3 git-filter-repo`*
 
 This is the actual command I used to remove the large files from the repo (in step 8 of the Gitlab doc)
+```shell
+git filter-repo --invert-paths --path path/to/folder --path path/to/file1 --path path/to/file2
+```
 
-        git filter-repo --invert-paths --path path/to/folder --path path/to/file1 --path path/to/file2
-        
 After running the "git filter-repo" command, there is a file in the project directory under "filiter-repo/commit-map". This file needs to be preserved and uploaded to the Gitlab server during the "Repository cleanup" section at the bottom of the document. Without this, the Gitlab server won't actually reduce the size of the repo.
 
 After running through this process, I was able to drop the repo size from 700MB to 5MB.
@@ -445,33 +458,40 @@ After running through this process, I was able to drop the repo size from 700MB 
 ### Useful Commands
 
 Watch the Salt Event Bus:
-
-        salt-run state.event pretty=True
+```shell
+salt-run state.event pretty=True
+```
 
 Refresh fileserver immediately:
+```shell
+salt-run fileserver.update
+```
 
-        salt-run fileserver.update
-        
 View directory list for an environment:
-
-        salt-run fileserver.dir_list saltenv=test
+```shell
+salt-run fileserver.dir_list saltenv=test
+```
 
 View file list for an environment:
+```shell
+salt-run fileserver.file_list saltenv=test
+```
 
-        salt-run fileserver.file_list saltenv=test
-        
 Troubleshoot a highstate run:
+```shell
+salt-call -l debug state.apply
+```
 
-        salt-call -l debug state.apply
-        
 Look up recent job IDs and view the output of one:
-
-        salt-run jobs.list_jobs
-        salt-run jobs.lookup_jid <job id number>
+```shell
+salt-run jobs.list_jobs
+salt-run jobs.lookup_jid <job id number>
+```
 
 Show currently running jobs:
-
-        salt-run jobs.active
+```shell
+salt-run jobs.active
+```
 
 # MySQL
 

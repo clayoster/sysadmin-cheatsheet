@@ -26,6 +26,7 @@
 - MySQL
   - [MySQL Common Commands](#MySQL-Common-Commands)
   - [Extracting a table from a mysqldump file](#Extracting-a-table-from-a-mysqldump-file)
+- [SMTP](#SMTP)
 - Networking
   - [Managing TCP Sessions](#Managing-TCP-Sessions)
   - [Clearing ARP cache](#Clearing-ARP-cache)
@@ -37,12 +38,17 @@
   - [RHEL](#RHEL)
   - [SSH](#SSH)
   - [Systemd](#Systemd)
-  - [Linux Benchmarking](#Linux-Benchmarking)
-  - [Linux Storage](#Linux-Storage)
+  - [Benchmarking](#Linux-Benchmarking)
+  - [Memory](#Linux-Memory)
+  - [Storage](#Linux-Storage)
     - [Rescan the SCSI Bus](#Rescan-the-SCSI-Bus)
     - [Finding Disk Usage](#Finding-Disk-Usage)
     - [Securely wiping a disk with Shred](#Securely-wiping-a-disk-with-Shred)
-    - [Miscellaneous](#Miscellaneous)
+    - [ZFS](#ZFS)
+    - [Monitoring Processes for Storage Issues](#Monitoring-Processes-for-Storage-Issues)
+  - [Miscellaneous](#Linux-Miscellaneous)
+- Out of Band Management
+  - [IPMI](#IPMI)
 - [Containers](#Containers)
   - [Container Hardening](#Container-Hardening)
   - [Kubernetes](#Kubernetes)
@@ -561,6 +567,31 @@ Re-import the table to the database with the new name:
 
 - Might need to manually copy the lines from just above the 'CREATE TABLE' line which configure the character set, etc.
 
+# SMTP
+
+#### testing smtp with STARTTLS
+
+```shell
+# Create a file with these contents named `testmessage`
+# Substitute your own from and to addresses
+EHLO example.com
+MAIL FROM: noreply@example.com
+RCPT TO:testuser1@example.com
+RCPT TO:testuser2@example.com
+DATA
+From: noreply@example.com
+To: testuser1@example.com,testuser2@example.com
+Subjet: Test Email
+The body goes here
+.
+QUIT
+
+# Use this openssl command to send the contents to the destination using STARTTLS
+openssl s_client -starttls smtp -connect smtp.example.com:597 -crlf < testmessage
+```
+
+add another example for testing plain-text SMTP with netcat or telnet
+
 # Networking
 
 ### Managing TCP Sessions
@@ -630,6 +661,9 @@ Using ethtool to view the "ens18" interface:
 			Current message level: 0x00000007 (7)
 								drv probe link
 		Link detected: yes
+
+### Monitoring live bandwidth usage on a specific interface
+iftop -i bond0
 
 ## VMware PowerCLI
 
@@ -799,6 +833,15 @@ Display a list of orphaned packages (requires the dnf-utils package)
 
         package-cleanup --leaves
 
+Cleaning up duplicate pacakges
+```shell
+# List duplicate packages installed on the server:
+dnf repoquery --duplicates
+
+# These can be cleaned up with:
+package-cleanup --cleandupes (requires yum-utils package)
+```
+
 Remove orphaned packages
 
         dnf autoremove
@@ -910,6 +953,10 @@ Random Writes
 
         sync; fio --randrepeat=1 --ioengine=libaio --direct=1 --name=test --filename=/path/to/testfile --bs=4k --size=4G --readwrite=randwrite --ramp_time=4
 
+Random Reads and Writes
+
+        sync; fio --randrepeat=1 --ioengine=libaio --direct=1 --name=test --filename=/path/to/testfile --bs=4k --size=4G --readwrite=randrw --rwmixread=70 --ramp_time=4
+
 #### Network Benchmarking Tool: iperf3
 You will need two servers for this test. One will act as the client and one will act as the server. These commands will run a 30 second test showing the speed that can be achieved between the two systems.
 
@@ -919,7 +966,22 @@ Server Command
 
 Client Command
 
-        iperf -c <ip of server running iperf3> -p 5201 -t 30s
+        iperf3 -c <ip of server running iperf3> -p 5201 -t 30s
+
+        # Run with more streams to help saturate bandwidth (4 streams)
+        iperf -c <ip of server running iperf3> -p 5201 -t 30s -P 4
+
+## Linux Memory
+
+Memory testing on a machine where you can't run memtest86 (like a router where you have shell access)
+```shell
+# Install 'memtester' package
+# Check available RAM first
+free -h
+# Run test (leave ~1GB headroom for the OS)
+# syntax: memtester <size> <passes>
+memtester 8G 1
+```
 
 ## Linux Storage
 
@@ -1015,7 +1077,64 @@ Using storcli to show all info for controller 0 (MegaRAID Controllers)
 
         storcli /c0 show all
 
-## Miscellaneous
+
+### ZFS
+
+# Monitor IO Statistics on a ZFS Zpool (read/write IOPS and bandwidth)
+```shell
+zpool iostat -v 2
+```
+
+### Monitoring Processes for Storage Issues
+
+Using the top command to view stalling processes:
+
+* Open the `top` command
+* Type `o` and add the filter `S=D`, then hit enter.
+* Show full process string - Type `c`
+* Processes showing the `D` state are getting stuck waiting on I/O
+
+Viewing process io statistics:
+```shell
+cat /proc/\<pid>/io
+```
+View which files a process has open
+```shell
+ls -l /proc/<pid>/fd/
+```
+
+Monitor local storage devices for performance issues (from sysstat package)
+```shell
+watch "iostat -xz"
+# Look for
+#   - High %util
+#   - Large await times
+#   - Growing queue depths
+```
+
+Show process-level IO stats (samples every second)
+```shell
+pidstat -d 1 -p <pid>
+```
+
+
+## Linux Miscellaneous
+
+#### Find command that avoids multiple paths
+```shell
+find / \( -path "/mount1" -o -path "/mount2" -o -path "/mount3" \) -prune -o -iname 'filename.yaml'
+```
+
+#### Run an strace on a running process to see what it is doing
+```shell
+strace -p <pid>
+# Multiple processes
+strace -p <pid> -p <pid> -p <pid>
+# Follow forks and child processes
+strace -fp <main pid>
+```
+
+
 
 #### Determining the purpose of a server
 
@@ -1027,7 +1146,58 @@ I usually use a combination of looking at running services in `systemctl list-un
         systemd-detect-virt
         virt-what
 
+# Out of Band Management
+
+## IPMI
+
+ipmitool commands
+```shell
+# Can be run on the same system as the OOBM is located on
+ipmitool sel list
+ipmitool sel clear
+ipmitool sensor list
+ipmitool mc reset cold
+```
+
+Other options are needed if you are running the commands on a separate system that has access to the OOBM IP
+```shell
+ipmitool -I lanplus -H <OOBM_IP> -U <USER> -P '<PASS>' sel list
+```
+
 # Containers
+
+#### Pulling a container image from one registry and pushing it to another
+*(Assuming authentication is already in place)*
+```shell
+# Pull container image from the source registry
+docker pull ghcr.io/clayoster/dnsquery:latest
+# Tag image with the destination registry path
+docker tag ghcr.io/clayoster/dnsquery:latest hub.docker.com/clayoster/dnsquery:latest
+# Push to the destination registry
+docker push hub.docker.com/clayoster/dnsquery:latest
+```
+
+#### Docker image build commands:
+```shell
+# Force an amd64 image to be pulled to a arm64 machine (like an M series Macbook)
+docker pull ghcr.io/clayoster/dnsquery:latest --platform linux/amd64
+
+# Initiate an image build
+docker buildx build --target prod -t dnsquery:devtest .
+
+# Run that image 
+docker run --rm -p 127.0.0.1:8080:8080 dnsquery:devtest
+```
+
+#### Container Scanning with Trivy
+```shell
+# Trivy scan an image for critical and high vulnerabilities
+trivy image -s=CRITICAL,HIGH dnsquery:latest
+
+# Want to force trivy to use an image that is built locally? Specify the hash/id from docker image ls
+trivy image -s=CRITICAL,HIGH d939231bc670
+```
+
 ## Container Hardening
 Use the examples below to add container hardening. Beware these settings will probably break things.
 

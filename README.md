@@ -812,6 +812,7 @@ Other Useful RHEL Links:
 - RHEL Security Advisory Database: https://access.redhat.com/security/security-updates/
 - Red Hat CVE Database: https://access.redhat.com/security/security-updates/#/cve
 - RHEL Package Browser (Requires RHEL Account): https://access.redhat.com/downloads/content/package-browser
+- Fedora EPEL Package Information: https://packages.fedoraproject.org/pkgs/ImageMagick/ImageMagick/ # as an example
 
 ### RPM Database Corruption
 Fix yum/dnf if the command "hangs" and does not return output, or you receive errors that the RPM database is corrupted

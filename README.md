@@ -1032,47 +1032,47 @@ Use the examples below to add container hardening. Beware these settings will pr
 
 ### Docker Compose - Add these settings
 ```yaml
-    # Hardening settings
-    read_only: true
-    privileged: false
-    cap_drop:
-      - ALL
-    # If necessary, add capabilities back in
-    #cap_add:
-    #  - See https://man7.org/linux/man-pages/man7/capabilities.7.html) for options
-    security_opt:
-      - 'no-new-privileges=true'
-    # Necessary if the app needs to write to /tmp
-    #tmpfs:
-    #  - /tmp
+# Hardening settings
+read_only: true
+privileged: false
+cap_drop:
+  - ALL
+# If necessary, add capabilities back in
+#cap_add:
+#  - See https://man7.org/linux/man-pages/man7/capabilities.7.html) for options
+security_opt:
+  - 'no-new-privileges=true'
+# Necessary if the app needs to write to /tmp
+#tmpfs:
+#  - /tmp
 ```
 ### Kubernetes Pod Manifests - Add these settings 
 ```yaml
-   spec:
-      containers:
-        - name: example
-          image: alpine:latest
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-              # If necessary, add capabilities back in
-              #add:
-              #  - See https://man7.org/linux/man-pages/man7/capabilities.7.html) for options
-            privileged: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            seccompProfile:
-              type: RuntimeDefault
-      # Necessary if the app needs to write to /tmp
-      #    volumeMounts:
-      #      - name: tmp
-      #        mountPath: /tmp
-      #volumes:
-      #  - name: tmp
-      #    emptyDir:
-      #      medium: Memory
+spec:
+   containers:
+     - name: example
+       image: alpine:latest
+       securityContext:
+         allowPrivilegeEscalation: false
+         capabilities:
+           drop:
+             - ALL
+           # If necessary, add capabilities back in
+           #add:
+           #  - See https://man7.org/linux/man-pages/man7/capabilities.7.html) for options
+         privileged: false
+         readOnlyRootFilesystem: true
+         runAsNonRoot: true
+         seccompProfile:
+           type: RuntimeDefault
+   # Necessary if the app needs to write to /tmp
+   #    volumeMounts:
+   #      - name: tmp
+   #        mountPath: /tmp
+   #volumes:
+   #  - name: tmp
+   #    emptyDir:
+   #      medium: Memory
 ```
 
 

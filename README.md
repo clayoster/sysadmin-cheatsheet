@@ -1065,13 +1065,14 @@ Use the examples below to add container hardening. Beware these settings will pr
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          volumeMounts:
-            - name: tmp
-              mountPath: /tmp
-      volumes:
-        - name: tmp
-          emptyDir:
-            medium: Memory
+      # Necessary if the app needs to write to /tmp
+      #    volumeMounts:
+      #      - name: tmp
+      #        mountPath: /tmp
+      #volumes:
+      #  - name: tmp
+      #    emptyDir:
+      #      medium: Memory
 ```
 
 

@@ -1385,7 +1385,22 @@ Follow the flux controller logs
 	
 3. To disable the beep also in less (i.e. also in man pages and when using "git diff") you need to add `export LESS="$LESS -R -Q"` in your ~/.profile file.
 
-#### Disable the terminal beep sound in Windows - Possibly a better approach
+#### Completely Disable the terminal beep sound in Windows Terminal
+*This will apply to SSH sessions*<br>
+In Windows Terminal, go to Settings > Profiles > Defaults > Additional Settings > Advanced > Bell Notification Style and unset "audible" here. The corresponding setting in the settings.json file for Windows Terminal look like this:
+
+```json
+{
+  "profiles": {
+    "defaults": {
+      "bellStyle": "none"
+    }
+  }
+}
+```
+`bellStyle` may also include "window" or "taskbar" which may be acceptable as they do not trigger sounds.
+
+#### Disable the terminal beep sound completely in Windows
 The "Critical Stop" sound in Windows is what is played when terminal beeps occur. Setting the sound to "(none)" doesn't disable the sound, but instead causes a different default sound to be played.
 A better option is to generate a slient WAV format file and set that as the sound for "Critical Stop"
 1. Install the `sox` package (Swiss army knife of sound processing)

@@ -1378,6 +1378,11 @@ kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{","}{ran
 kubectl get pods -n <namespace> -o custom-columns=NAME:.metadata.name,UID:.metadata.uid | grep <pod-uid>
 ```
 
+#### View the validity dates of the certificate in a TLS secret
+```shell
+kubectl get secret <secret name> -n <namespace> -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -text -noout | grep "Not Before" -C 1
+```
+
 ## Troubleshooting
 
 Launch a shell into running pod (assuming /bin/sh is available)

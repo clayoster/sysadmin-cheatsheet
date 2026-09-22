@@ -1527,6 +1527,15 @@ Launch the Hubble Web UI - Visualizes traffic flows (filters for namespace and a
 
 	cilium hubble ui
 
+Viewing the effective policies that are applying to a pod
+```shell
+# Find the pod id in this output
+kubectl -n kube-system exec <cilium pod name> -- cilium-dbg endpoint list
+
+# Use jq to parse out the effective policies
+kubectl -n kube-system exec <cilium pod name> -- cilium-dbg endpoint get <pod id> | jq '.[].status.policy'
+```
+
 ## Kustomize
 
 Test building kustomize paths:
